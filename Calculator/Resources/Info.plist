@@ -16,10 +16,18 @@
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
 					<key>UISceneStoryboardFile</key>
-					<string>Main</string>
+					<string>Main_iPad</string>
+                    <key>UILaunchStoryboardName~ipad</key>
+                    <string>Main_iPad</string>
+                    <key>UILaunchStoryboardName~iphone</key>
+                    <string>Main</string>
 				</dict>
 			</array>
 		</dict>
 	</dict>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>Main_iPad</string>
+	<key>UISceneStoryboardFile</key>
+	<string>Main_iPad</string>
 </dict>
 </plist>

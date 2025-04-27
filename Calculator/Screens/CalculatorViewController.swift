@@ -37,7 +37,7 @@ class CalculatorViewController: UIViewController {
     //MARK: - @IBActions
     
     @IBAction func numberClicked(_ sender: UIButton) {
-        if sender.tag == 0 && (displayNumber.isEmpty || numberLabel.text == "0") {
+        if numberLabel.text == "0" && sender.tag == 0 {
             return
         }
         if numberLabel.text == "0" {
@@ -127,14 +127,22 @@ class CalculatorViewController: UIViewController {
                 if currentNumber != 0 {
                     secondNumber /= currentNumber
                 } else {
-                    alert(title: "Error", message: "Cannot divide by zero")
+                    DispatchQueue.main.async {
+                        self.numberLabel.text = "Error"
+                        self.alert(title: "Error", message: "Cannot divide by zero")
+                    }
+                    displayNumber = ""
                     return
                 }
             }
         } else {
             secondNumber = currentNumber
         }
+        DispatchQueue.main.async {
+            self.numberLabel.text = self.formatNumber(self.secondNumber)
+        }
     }
+    
     func alert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
