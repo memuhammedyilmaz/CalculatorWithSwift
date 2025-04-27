@@ -12,7 +12,6 @@ enum Operation : String {
     case subtraction = "-"
     case multiplication = "x"
     case division = "÷"
-    case percent = "%"
 }
 
 class CalculatorViewController: UIViewController {
@@ -26,8 +25,6 @@ class CalculatorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // memuhammedyilmaz
-        
         numberLabel.text = "0"
         
         let allButtons = getAllButtons(in: view)
@@ -38,7 +35,11 @@ class CalculatorViewController: UIViewController {
     }
     
     //MARK: - @IBActions
+    
     @IBAction func numberClicked(_ sender: UIButton) {
+        if sender.tag == 0 && (displayNumber.isEmpty || numberLabel.text == "0") {
+            return
+        }
         if numberLabel.text == "0" {
             numberLabel.text = ""
         }
@@ -54,59 +55,22 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func operationClicked(_ sender: UIButton) {
-        if let operation = sender.titleLabel?.text {
-            if !displayNumber.isEmpty {
-                
-                let currentNumber = Double(displayNumber) ?? 0.0
-                if let currentOperation = operationType {
-                    switch currentOperation {
-                    case .addition:
-                        secondNumber += currentNumber
-                    case .subtraction:
-                        secondNumber -= currentNumber
-                    case .multiplication:
-                        secondNumber *= currentNumber
-                    case .percent:
-                        secondNumber = currentNumber / 100
-                    case .division:
-                        if currentNumber != 0 {
-                            secondNumber /= currentNumber
-                        } else {
-                            alert(title: "Error", message: "Cannot divide by zero")
-                            return
-                        }
-                    }
-                } else {
-                    secondNumber = currentNumber
-                }
-            }
-            operationType = Operation(rawValue: operation)
-            displayNumber = ""
+        guard let operation = sender.titleLabel?.text else { return }
+        if !displayNumber.isEmpty {
+            switchControl()
+        }
+        operationType = Operation(rawValue: operation)
+        if displayNumber.contains(".") {
+            numberLabel.text = secondNumber.description
+        } else {
             numberLabel.text = formatNumber(secondNumber)
         }
+        displayNumber = ""
     }
     
     @IBAction func equalButton(_ sender: UIButton) {
         if !displayNumber.isEmpty {
-            let currentNumber = Double(displayNumber) ?? 0.0
-            guard let operation = operationType else { return }
-            switch operation {
-            case .addition:
-                secondNumber += currentNumber
-            case .subtraction:
-                secondNumber -= currentNumber
-            case .multiplication:
-                secondNumber *= currentNumber
-            case .percent:
-                secondNumber *= currentNumber / 100
-            case .division:
-                if currentNumber != 0 {
-                    secondNumber /= currentNumber
-                } else {
-                    alert(title: "Error", message: "Cannot divide by zero")
-                    return
-                }
-            }
+            switchControl()
         }
         operationType = nil
         displayNumber = ""
@@ -114,16 +78,24 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func chanceButton(_ sender: UIButton) {
-        if let currentNumber = Double(displayNumber) {
-            secondNumber = -currentNumber
-            numberLabel.text = formatNumber(secondNumber)
-            displayNumber = ""
-        }
+        if displayNumber.isEmpty { return }
+        guard let currentNumber = Double(displayNumber) else { return }
+        let toggledNumber = -currentNumber
+        displayNumber = formatNumber(toggledNumber)
+        numberLabel.text = displayNumber
     }
     
     @IBAction func commaButton(_ sender: UIButton) {
         if displayNumber.contains(".") { return }
         displayNumber += "."
+        numberLabel.text = formatNumber(Double(displayNumber) ?? 0.0)
+    }
+    
+    @IBAction func percentButton(_ sender: UIButton) {
+        if displayNumber.isEmpty { return }
+        guard let currentNumber = Double(displayNumber) else { return }
+        let percentValue = currentNumber / 100
+        displayNumber = formatNumber(percentValue)
         numberLabel.text = displayNumber
     }
     
@@ -141,6 +113,28 @@ class CalculatorViewController: UIViewController {
         return buttons
     }
     
+    func switchControl() {
+        let currentNumber = Double(displayNumber) ?? 0.0
+        if let currentOperation = operationType {
+            switch currentOperation {
+            case .addition:
+                secondNumber += currentNumber
+            case .subtraction:
+                secondNumber -= currentNumber
+            case .multiplication:
+                secondNumber *= currentNumber
+            case .division:
+                if currentNumber != 0 {
+                    secondNumber /= currentNumber
+                } else {
+                    alert(title: "Error", message: "Cannot divide by zero")
+                    return
+                }
+            }
+        } else {
+            secondNumber = currentNumber
+        }
+    }
     func alert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
