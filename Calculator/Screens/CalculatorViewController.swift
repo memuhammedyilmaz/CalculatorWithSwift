@@ -25,6 +25,9 @@ class CalculatorViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // memuhammedyilmaz
+        
         numberLabel.text = "0"
         
         let allButtons = getAllButtons(in: view)
